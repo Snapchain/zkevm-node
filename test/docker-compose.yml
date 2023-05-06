@@ -271,10 +271,36 @@ services:
       - MIX_ENV=prod
       - LOGO=/images/blockscout_logo.svg
       - LOGO_FOOTER=/images/blockscout_logo.svg
+      - VIRTUAL_HOST=explorer-l2.<user-rollup-identifier>.snapchain.dev
+      - LETSENCRYPT_HOST=explorer-l2.<user-rollup-identifier>.snapchain.dev
+      - VIRTUAL_PORT=4000
     command:
       - "/bin/sh"
       - "-c"
       - "mix do ecto.create, ecto.migrate; mix phx.server"
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    restart: always
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock
 
   zkevm-explorer-json-rpc:
     container_name: zkevm-explorer-json-rpc
@@ -445,3 +471,10 @@ services:
       - --web.enable-lifecycle
     volumes:
       - ../config/metrics/prometheus:/etc/prometheus
+
+volumes:
+  conf:
+  vhost:
+  html:
+  certs:
+  acme:

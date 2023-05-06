@@ -281,6 +281,15 @@ run-l2-explorer: ## Runs L2 blockscan explorer
 	$(RUNEXPLORERJSONRPC)
 	$(RUNEXPLORERL2)
 
+.PHONY: build-docker-compose
+build-docker-compose: ## Builds docker-compose.yml
+	@if [ -z "$(USER_ROLLUP_IDENTIFIER)" ]; then \
+			echo "Error: USER_ROLLUP_IDENTIFIER variable is not set. Please provide a value."; \
+			exit 1; \
+	fi
+	@sed -i.bak 's/<user-rollup-identifier>/$(USER_ROLLUP_IDENTIFIER)/g' docker-compose.yml
+	@rm -f docker-compose.yml.bak
+
 .PHONY: run-l2-explorer-json-rpc
 run-l2-explorer-json-rpc: ## Runs L2 explorer json rpc
 	$(RUNEXPLORERJSONRPC)
