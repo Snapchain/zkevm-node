@@ -343,6 +343,10 @@ services:
     ports:
       - 8545:8545
       - 8546:8546
+    environment:
+      - VIRTUAL_HOST=rpc-l1.<user-rollup-identifier>.snapchain.dev
+      - LETSENCRYPT_HOST=rpc-l1.<user-rollup-identifier>.snapchain.dev
+      - VIRTUAL_PORT=8545
     command:
       - "--http"
       - "--http.api"
