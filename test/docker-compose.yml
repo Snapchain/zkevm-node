@@ -89,6 +89,9 @@ services:
     environment:
       - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
+      - VIRTUAL_HOST=rpc-l2.<user-rollup-identifier>.snapchain.dev
+      - LETSENCRYPT_HOST=rpc-l2.<user-rollup-identifier>.snapchain.dev
+      - VIRTUAL_PORT=8123
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
@@ -301,6 +304,8 @@ services:
     volumes:
       - acme:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - "DEFAULT_EMAIL=founders@snapchain.dev"
 
   zkevm-explorer-json-rpc:
     container_name: zkevm-explorer-json-rpc
