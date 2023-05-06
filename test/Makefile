@@ -432,7 +432,7 @@ run: ## Runs a full node
 run-with-nginx: run ## Runs a full node with nginx
 	$(RUNNGINXPROXY)
 	$(RUNNGINXPROXYACME)
-  $(MAKE) run-l2-explorer
+	$(MAKE) run-l2-explorer
 
 .PHONY: stop
 stop: ## Stops all services
