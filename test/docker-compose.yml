@@ -239,6 +239,9 @@ services:
       - DATABASE_URL=postgres://l1_explorer_user:l1_explorer_password@zkevm-explorer-l1-db:5432/l1_explorer_db
       - ECTO_USE_SSL=false
       - MIX_ENV=prod
+      - VIRTUAL_HOST=explorer-l1.<user-rollup-identifier>.snapchain.dev
+      - LETSENCRYPT_HOST=explorer-l1.<user-rollup-identifier>.snapchain.dev
+      - VIRTUAL_PORT=4000
     command:
       - "/bin/sh"
       - "-c"
@@ -248,7 +251,7 @@ services:
     container_name: zkevm-explorer-l1-db
     image: postgres
     ports:
-      - 5435:5432
+      - 5437:5432
     environment:
       - POSTGRES_USER=l1_explorer_user
       - POSTGRES_PASSWORD=l1_explorer_password
