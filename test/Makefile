@@ -22,6 +22,8 @@ DOCKERCOMPOSEPERMISSIONLESSZKPROVER := zkevm-permissionless-prover
 DOCKERCOMPOSENODEAPPROVE := zkevm-approve
 DOCKERCOMPOSEMETRICS := zkevm-metrics
 DOCKERCOMPOSEGRAFANA := grafana
+DOCKERCOMPOSENGINXPROXY := nginx-proxy
+DOCKERCOMPOSENGINXPROXYACME := nginx-proxy-acme
 
 RUNSTATEDB := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSESTATEDB)
 RUNPOOLDB := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEPOOLDB)
@@ -50,6 +52,9 @@ RUNPERMISSIONLESSZKPROVER := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEPERMISSIONLES
 RUNAPPROVE := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSENODEAPPROVE)
 
 RUNMETRICS := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEMETRICS)
+
+RUNNGINXPROXY := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSENGINXPROXY)
+RUNNGINXPROXYACME := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSENGINXPROXYACME)
 
 RUN := $(DOCKERCOMPOSE) up -d
 
@@ -281,6 +286,15 @@ run-l2-explorer: ## Runs L2 blockscan explorer
 	$(RUNEXPLORERJSONRPC)
 	$(RUNEXPLORERL2)
 
+.PHONY: build-docker-compose
+build-docker-compose: ## Builds docker-compose.yml
+	@if [ -z "$(USER_ROLLUP_IDENTIFIER)" ]; then \
+			echo "Error: USER_ROLLUP_IDENTIFIER variable is not set. Please provide a value."; \
+			exit 1; \
+	fi
+	@sed -i.bak 's/<user-rollup-identifier>/$(USER_ROLLUP_IDENTIFIER)/g' docker-compose.yml
+	@rm -f docker-compose.yml.bak
+
 .PHONY: run-l2-explorer-json-rpc
 run-l2-explorer-json-rpc: ## Runs L2 explorer json rpc
 	$(RUNEXPLORERJSONRPC)
@@ -413,6 +427,12 @@ run: ## Runs a full node
 	$(RUNL2GASPRICER)
 	$(RUNAGGREGATOR)
 	$(RUNJSONRPC)
+
+.PHONY: run-with-nginx
+run-with-nginx: run ## Runs a full node with nginx
+	$(RUNNGINXPROXY)
+	$(RUNNGINXPROXYACME)
+	$(MAKE) run-explorer
 
 .PHONY: stop
 stop: ## Stops all services
