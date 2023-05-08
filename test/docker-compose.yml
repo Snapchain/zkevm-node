@@ -49,6 +49,13 @@ services:
   zkevm-sequencer:
     container_name: zkevm-sequencer
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 9092:9091 # needed if metrics enabled
       - 6060:6060
@@ -66,6 +73,13 @@ services:
   zkevm-sequence-sender:
     container_name: zkevm-sequence-sender
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     environment:
       - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
@@ -82,6 +96,13 @@ services:
   zkevm-json-rpc:
     container_name: zkevm-json-rpc
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 8123:8123
       - 8133:8133 # needed if WebSockets enabled
@@ -103,6 +124,13 @@ services:
   zkevm-aggregator:
     container_name: zkevm-aggregator
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 50081:50081
       - 9093:9091 # needed if metrics enabled
@@ -120,6 +148,9 @@ services:
   zkevm-sync:
     container_name: zkevm-sync
     image: zkevm-node
+    depends_on:
+      zkevm-state-db:
+        condition: service_healthy
     environment:
       - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
     volumes:
@@ -133,6 +164,13 @@ services:
   zkevm-eth-tx-manager:
     container_name: zkevm-eth-tx-manager
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 9094:9091 # needed if metrics enabled
     environment:
@@ -150,6 +188,13 @@ services:
   zkevm-l2gaspricer:
     container_name: zkevm-l2gaspricer
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     environment:
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
     volumes:
@@ -170,6 +215,11 @@ services:
           memory: 2G
         reservations:
           memory: 1G
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - 5432:5432
     volumes:
@@ -186,6 +236,11 @@ services:
   zkevm-pool-db:
     container_name: zkevm-pool-db
     image: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -264,6 +319,8 @@ services:
   zkevm-explorer-l2:
     container_name: zkevm-explorer-l2
     image: hermeznetwork/zkevm-explorer:latest
+    depends_on:
+      - zkevm-explorer-json-rpc
     ports:
       - 4001:4000
     environment:
@@ -313,6 +370,13 @@ services:
   zkevm-explorer-json-rpc:
     container_name: zkevm-explorer-json-rpc
     image: zkevm-node
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 8124:8124
       - 8134:8134 # needed if WebSockets enabled
@@ -332,6 +396,13 @@ services:
   zkevm-explorer-l2-db:
     container_name: zkevm-explorer-l2-db
     image: postgres
+    depends_on:
+      zkevm-pool-db:
+        condition: service_healthy
+      zkevm-state-db:
+        condition: service_healthy
+      zkevm-sync:
+        condition: service_started
     ports:
       - 5436:5432
     environment:
@@ -375,6 +446,9 @@ services:
   zkevm-prover:
     container_name: zkevm-prover
     image: hermeznetwork/zkevm-prover:b6fe2db
+    depends_on:
+      zkevm-state-db:
+        condition: service_healthy
     ports:
       # - 50051:50051 # Prover
       - 50052:50052 # Mock prover
@@ -399,6 +473,9 @@ services:
   zkevm-approve:
     container_name: zkevm-approve
     image: zkevm-node
+    depends_on:
+      zkevm-state-db:
+        condition: service_healthy
     environment:
       - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
     volumes:
