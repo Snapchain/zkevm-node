@@ -293,6 +293,11 @@ build-docker-compose: ## Builds docker-compose.yml
 			exit 1; \
 	fi
 	@sed -i.bak 's/<user-rollup-identifier>/$(USER_ROLLUP_IDENTIFIER)/g' docker-compose.yml
+	@if [ -z "$(ZEROSSL_API_KEY)" ]; then \
+			echo "Error: ZEROSSL_API_KEY variable is not set. Please provide a value."; \
+			exit 1; \
+	fi
+	@sed -i.bak 's/<ZEROSSL_API_KEY>/$(ZEROSSL_API_KEY)/g' docker-compose.yml
 	@rm -f docker-compose.yml.bak
 
 .PHONY: run-l2-explorer-json-rpc
