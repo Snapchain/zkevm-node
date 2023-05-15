@@ -282,7 +282,7 @@ services:
 
   zkevm-explorer-l1:
     container_name: zkevm-explorer-l1
-    image: hermeznetwork/zkevm-explorer:latest
+    image: scmorgan/sc-hermez-zkevm-explorer:latest
     ports:
       - 4000:4000
     environment:
