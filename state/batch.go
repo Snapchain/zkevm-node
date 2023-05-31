@@ -145,10 +145,15 @@ func (s *State) ProcessSequencerBatch(ctx context.Context, batchNumber uint64, b
 		return nil, err
 	}
 
-	txs, _, err := DecodeTxs(batchL2Data)
-	if err != nil && !errors.Is(err, ErrInvalidData) {
-		return nil, err
+	txs := []types.Transaction{}
+
+	if processBatchResponse.Responses != nil && len(processBatchResponse.Responses) > 0 {
+		txs, _, err = DecodeTxs(batchL2Data)
+		if err != nil && !errors.Is(err, ErrInvalidData) {
+			return nil, err
+		}
 	}
+
 	result, err := s.convertToProcessBatchResponse(txs, processBatchResponse)
 	if err != nil {
 		return nil, err
@@ -169,8 +174,9 @@ func (s *State) ProcessBatch(ctx context.Context, request ProcessRequest, update
 	}
 
 	forkID := GetForkIDByBatchNumber(s.cfg.ForkIDIntervals, request.BatchNumber)
+
 	// Create Batch
-	processBatchRequest := &pb.ProcessBatchRequest{
+	var processBatchRequest = &pb.ProcessBatchRequest{
 		OldBatchNum:      request.BatchNumber - 1,
 		Coinbase:         request.Coinbase.String(),
 		BatchL2Data:      request.Transactions,
@@ -264,6 +270,12 @@ func (s *State) ExecuteBatch(ctx context.Context, batch Batch, updateMerkleTree 
 	return processBatchResponse, err
 }
 
+/*
+func uint32ToBool(value uint32) bool {
+	return value != 0
+}
+*/
+
 func (s *State) processBatch(ctx context.Context, batchNumber uint64, batchL2Data []byte, caller metrics.CallerLabel, dbTx pgx.Tx) (*pb.ProcessBatchResponse, error) {
 	if dbTx == nil {
 		return nil, ErrDBTxNil
@@ -299,6 +311,7 @@ func (s *State) processBatch(ctx context.Context, batchNumber uint64, batchL2Dat
 		return nil, ErrInvalidBatchNumber
 	}
 	forkID := GetForkIDByBatchNumber(s.cfg.ForkIDIntervals, lastBatch.BatchNumber)
+
 	// Create Batch
 	processBatchRequest := &pb.ProcessBatchRequest{
 		OldBatchNum:      lastBatch.BatchNumber - 1,
@@ -313,9 +326,7 @@ func (s *State) processBatch(ctx context.Context, batchNumber uint64, batchL2Dat
 		ForkId:           forkID,
 	}
 
-	res, err := s.sendBatchRequestToExecutor(ctx, processBatchRequest, caller)
-
-	return res, err
+	return s.sendBatchRequestToExecutor(ctx, processBatchRequest, caller)
 }
 
 func (s *State) sendBatchRequestToExecutor(ctx context.Context, processBatchRequest *pb.ProcessBatchRequest, caller metrics.CallerLabel) (*pb.ProcessBatchResponse, error) {
@@ -419,7 +430,7 @@ func (s *State) ProcessAndStoreClosedBatch(ctx context.Context, processingCtx Pr
 	// Filter unprocessed txs and decode txs to store metadata
 	// note that if the batch is not well encoded it will result in an empty batch (with no txs)
 	for i := 0; i < len(processed.Responses); i++ {
-		if !isProcessed(processed.Responses[i].Error) {
+		if !IsStateRootChanged(processed.Responses[i].Error) {
 			if executor.IsROMOutOfCountersError(processed.Responses[i].Error) {
 				processed.Responses = []*pb.ProcessTransactionResponse{}
 				break

@@ -20,8 +20,8 @@ MaxConns = 200
 
 [Pool]
 IntervalToRefreshBlockedAddresses = "5m"
-MaxTxBytesSize=30132
-MaxTxDataBytesSize=30000
+MaxTxBytesSize=100132
+MaxTxDataBytesSize=100000
 DefaultMinGasPriceAllowed = 1000000000
 MinAllowedGasPriceInterval = "5m"
 PollMinAllowedGasPriceInterval = "15s"
@@ -36,7 +36,7 @@ PollMinAllowedGasPriceInterval = "15s"
 
 [Etherman]
 URL = "http://localhost:8545"
-MultiGasProvider = true
+MultiGasProvider = false
 	[Etherman.Etherscan]
 		ApiKey = ""
 
@@ -47,25 +47,24 @@ ForcedGas = 0
 
 [RPC]
 Host = "0.0.0.0"
-Port = 8123
+Port = 8545
 ReadTimeout = "60s"
 WriteTimeout = "60s"
-MaxRequestsPerIPAndSecond = 50
+MaxRequestsPerIPAndSecond = 500
 SequencerNodeURI = ""
-DefaultSenderAddress = "0x1111111111111111111111111111111111111111"
 EnableL2SuggestedGasPricePolling = true
 	[RPC.WebSockets]
 		Enabled = true
-		Port = 8124
+		Host = "0.0.0.0"
+		Port = 8546
 
 [Synchronizer]
-SyncInterval = "0s"
+SyncInterval = "1s"
 SyncChunkSize = 100
-TrustedSequencerURL = ""
+TrustedSequencerURL = "" # If it is empty or not specified, then the value is read from the smc
 
 [Sequencer]
 WaitPeriodPoolIsEmpty = "1s"
-
 BlocksAmountForTxsToBeDeleted = 100
 FrequencyToCheckTxsForDelete = "12h"
 MaxTxsPerBatch = 150
@@ -99,8 +98,7 @@ MaxTxLifetime = "3h"
 		ClosingSignalsManagerWaitForCheckingGER = "10s"
 		ClosingSignalsManagerWaitForCheckingForcedBatches = "10s"
 		ForcedBatchesFinalityNumberOfBlocks = 64
-		TimestampResolution = "15s"	
-		PrivateKeys = [{Path = "/pk/sequencer.keystore", Password = "testonly"}]
+		TimestampResolution = "10s"	
 	[Sequencer.DBManager]
 		PoolRetrievalInterval = "500ms"
 		L2ReorgRetrievalInterval = "5s"
@@ -135,9 +133,6 @@ Type = "follower"
 UpdatePeriod = "10s"
 Factor = 0.15
 DefaultGasPriceWei = 2000000000
-
-[Prover]
-ProverURI = "0.0.0.0:50051"
 
 [MTClient]
 URI = "zkevm-prover:50061"

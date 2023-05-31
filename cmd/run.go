@@ -119,15 +119,17 @@ func start(cliCtx *cli.Context) error {
 		log.Fatal(err)
 	}
 	// Read Fork ID FROM POE SC
-	forkIDIntervals, err := etherman.GetForks(cliCtx.Context)
-	if err != nil || len(forkIDIntervals) == 0 {
-		log.Fatal("error getting forks: ", err)
+	forkIDIntervals, err := etherman.GetForks(cliCtx.Context, c.NetworkConfig.Genesis.GenesisBlockNum)
+	if err != nil {
+		log.Fatal("error getting forks. Please check the configuration. Error: ", err)
+	} else if len(forkIDIntervals) == 0 {
+		log.Fatal("error: no forkID received. It should receive at least one, please check the configuration...")
 	}
+
 	currentForkID := forkIDIntervals[len(forkIDIntervals)-1].ForkId
 
 	c.Aggregator.ChainID = l2ChainID
 	c.Aggregator.ForkId = currentForkID
-	c.RPC.ChainID = l2ChainID
 	log.Infof("Chain ID read from POE SC = %v", l2ChainID)
 
 	ctx := context.Background()
@@ -201,7 +203,7 @@ func start(cliCtx *cli.Context) error {
 			for _, a := range cliCtx.StringSlice(config.FlagHTTPAPI) {
 				apis[a] = true
 			}
-			go runJSONRPCServer(*c, poolInstance, st, apis)
+			go runJSONRPCServer(*c, l2ChainID, poolInstance, st, apis)
 		case SYNCHRONIZER:
 			ev.Component = event.Component_Synchronizer
 			ev.Description = "Running synchronizer"
@@ -312,11 +314,54 @@ func runSynchronizer(cfg config.Config, etherman *etherman.Client, ethTxManager 
 	}
 }
 
-func runJSONRPCServer(c config.Config, pool *pool.Pool, st *state.State, apis map[string]bool) {
+func runJSONRPCServer(c config.Config, chainID uint64, pool *pool.Pool, st *state.State, apis map[string]bool) {
 	storage := jsonrpc.NewStorage()
 	c.RPC.MaxCumulativeGasUsed = c.Sequencer.MaxCumulativeGasUsed
 
-	if err := jsonrpc.NewServer(c.RPC, pool, st, storage, apis).Start(); err != nil {
+	services := []jsonrpc.Service{}
+	if _, ok := apis[jsonrpc.APIEth]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APIEth,
+			Service: jsonrpc.NewEthEndpoints(c.RPC, chainID, pool, st, storage),
+		})
+	}
+
+	if _, ok := apis[jsonrpc.APINet]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APINet,
+			Service: jsonrpc.NewNetEndpoints(chainID),
+		})
+	}
+
+	if _, ok := apis[jsonrpc.APIZKEVM]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APIZKEVM,
+			Service: jsonrpc.NewZKEVMEndpoints(st),
+		})
+	}
+
+	if _, ok := apis[jsonrpc.APITxPool]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APITxPool,
+			Service: &jsonrpc.TxPoolEndpoints{},
+		})
+	}
+
+	if _, ok := apis[jsonrpc.APIDebug]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APIDebug,
+			Service: jsonrpc.NewDebugEndpoints(st),
+		})
+	}
+
+	if _, ok := apis[jsonrpc.APIWeb3]; ok {
+		services = append(services, jsonrpc.Service{
+			Name:    jsonrpc.APIWeb3,
+			Service: &jsonrpc.Web3Endpoints{},
+		})
+	}
+
+	if err := jsonrpc.NewServer(c.RPC, chainID, pool, st, storage, services).Start(); err != nil {
 		log.Fatal(err)
 	}
 }

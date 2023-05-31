@@ -183,7 +183,7 @@ func Test_Defaults(t *testing.T) {
 		},
 		{
 			path:          "Sequencer.Finalizer.TimestampResolution",
-			expectedValue: types.NewDuration(15 * time.Second),
+			expectedValue: types.NewDuration(10 * time.Second),
 		},
 		{
 			path:          "Sequencer.DBManager.PoolRetrievalInterval",
@@ -231,7 +231,7 @@ func Test_Defaults(t *testing.T) {
 		},
 		{
 			path:          "Etherman.MultiGasProvider",
-			expectedValue: true,
+			expectedValue: false,
 		},
 		{
 			path:          "EthTxManager.FrequencyToMonitorTxs",
@@ -295,11 +295,11 @@ func Test_Defaults(t *testing.T) {
 		},
 		{
 			path:          "Pool.MaxTxBytesSize",
-			expectedValue: uint64(30132),
+			expectedValue: uint64(100132),
 		},
 		{
 			path:          "Pool.MaxTxDataBytesSize",
-			expectedValue: 30000,
+			expectedValue: 100000,
 		},
 
 		{
@@ -348,7 +348,7 @@ func Test_Defaults(t *testing.T) {
 		},
 		{
 			path:          "RPC.Port",
-			expectedValue: int(8123),
+			expectedValue: int(8545),
 		},
 		{
 			path:          "RPC.ReadTimeout",
@@ -364,24 +364,23 @@ func Test_Defaults(t *testing.T) {
 		},
 		{
 			path:          "RPC.MaxRequestsPerIPAndSecond",
-			expectedValue: float64(50),
+			expectedValue: float64(500),
 		},
-		{
-			path:          "RPC.DefaultSenderAddress",
-			expectedValue: "0x1111111111111111111111111111111111111111",
-		},
-		{
-			path:          "RPC.WebSockets.Enabled",
-			expectedValue: true,
-		},
-
 		{
 			path:          "RPC.EnableL2SuggestedGasPricePolling",
 			expectedValue: true,
 		},
 		{
+			path:          "RPC.WebSockets.Enabled",
+			expectedValue: true,
+		},
+		{
+			path:          "RPC.WebSockets.Host",
+			expectedValue: "0.0.0.0",
+		},
+		{
 			path:          "RPC.WebSockets.Port",
-			expectedValue: 8124,
+			expectedValue: int(8546),
 		},
 		{
 			path:          "Executor.URI",
