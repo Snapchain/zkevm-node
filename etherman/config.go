@@ -13,4 +13,6 @@ type Config struct {
 
 	MultiGasProvider bool `mapstructure:"MultiGasProvider"`
 	Etherscan        etherscan.Config
+
+	L2ChainID uint64 `mapstructure:"L2ChainID"`
 }

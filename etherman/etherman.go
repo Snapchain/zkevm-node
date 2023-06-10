@@ -135,6 +135,8 @@ type Client struct {
 
 	GasProviders externalGasProviders
 
+	L2ChainID uint64
+
 	l1Cfg L1Config
 	auth  map[common.Address]bind.TransactOpts // empty in case of read-only client
 }
@@ -184,8 +186,9 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 			MultiGasProvider: cfg.MultiGasProvider,
 			Providers:        gProviders,
 		},
-		l1Cfg: l1Config,
-		auth:  map[common.Address]bind.TransactOpts{},
+		L2ChainID: cfg.L2ChainID,
+		l1Cfg:     l1Config,
+		auth:      map[common.Address]bind.TransactOpts{},
 	}, nil
 }
 

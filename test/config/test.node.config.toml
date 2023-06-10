@@ -33,6 +33,7 @@ PollMinAllowedGasPriceInterval = "15s"
 
 [Etherman]
 URL = "http://zkevm-mock-l1-network:8545"
+L2ChainID = 57489
 MultiGasProvider = false
 	[Etherscan]
 		ApiKey = ""
