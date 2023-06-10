@@ -335,6 +335,12 @@ build-docker-compose: ## Builds docker-compose.yml
 	fi
 	@sed -i.bak 's/<ZEROSSL_API_KEY>/$(ZEROSSL_API_KEY)/g' docker-compose.yml
 	@rm -f docker-compose.yml.bak
+	@if [ -z "$(L2_CHAIN_ID)" ]; then \
+			echo "Error: L2_CHAIN_ID variable is not set. Please provide a value."; \
+			exit 1; \
+	fi
+	@sed -i.bak 's/<l2-chain-id>/$(L2_CHAIN_ID)/g' config/test.node.config.toml
+	@rm -f config/test.node.config.toml.bak
 
 .PHONY: run-l2-explorer-json-rpc
 run-l2-explorer-json-rpc: ## Runs L2 explorer json rpc
