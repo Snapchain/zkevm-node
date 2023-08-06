@@ -113,8 +113,11 @@ func start(cliCtx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	// READ CHAIN ID FROM a config file
-	l2ChainID := etherman.L2ChainID
+	// READ CHAIN ID FROM POE SC
+	l2ChainID, err := etherman.GetL2ChainID()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Read Fork ID FROM POE SC
 	forkIDIntervals, err := etherman.GetForks(cliCtx.Context, c.NetworkConfig.Genesis.GenesisBlockNum)
 	if err != nil {

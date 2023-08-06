@@ -339,8 +339,8 @@ build-docker-compose: ## Builds docker-compose.yml
 			echo "Error: L2_CHAIN_ID variable is not set. Please provide a value."; \
 			exit 1; \
 	fi
-	@sed -i.bak 's/<l2-chain-id>/$(L2_CHAIN_ID)/g' config/test.node.config.toml
-	@rm -f config/test.node.config.toml.bak
+	@sed -i.bak 's/<l2-chain-id>/$(L2_CHAIN_ID)/g' docker-compose.yml
+	@rm -f docker-compose.yml.bak
 
 .PHONY: run-l2-explorer-json-rpc
 run-l2-explorer-json-rpc: ## Runs L2 explorer json rpc
