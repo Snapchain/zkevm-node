@@ -415,17 +415,15 @@ services:
 
   zkevm-mock-l1-network:
     container_name: zkevm-mock-l1-network
-    image: hermeznetwork/geth-zkevm-contracts:v1.1.0-snapchain
-    ports:
-      - 8545:8545
-      - 8546:8546
+    image: ethereum/client-go
     environment:
       - VIRTUAL_HOST=rpc-l1.<user-rollup-identifier>
       - LETSENCRYPT_HOST=rpc-l1.<user-rollup-identifier>
-      - VIRTUAL_PORT=8545
-      - L2_CHAIN_ID=<l2-chain-id>
-    entrypoint:
-      - /usr/local/bin/geth
+      - VIRTUAL_PORT=8545  
+    ports:
+      - 8545:8545
+      - 8546:8546
+    command:
       - "--http"
       - "--http.api"
       - "admin,eth,debug,miner,net,txpool,personal,web3"
@@ -446,6 +444,18 @@ services:
       - "--syncmode"
       - "full"
       - "--rpc.allow-unprotected-txs"
+
+  zkevm-contracts:
+    container_name: zkevm-contracts
+    image: snapchain/zkevm-contracts
+    depends_on:
+      zkevm-mock-l1-network:
+        condition: service_started    
+    environment:
+      - L2_CHAIN_ID=<l2-chain-id>
+      - JSONRPC_HTTP_URL=http://zkevm-mock-l1-network:8545
+    command:
+      - "./docker/scripts/deploy-contracts.sh"
 
   zkevm-prover:
     container_name: zkevm-prover

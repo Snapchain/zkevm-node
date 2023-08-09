@@ -10,6 +10,7 @@ DOCKERCOMPOSESTATEDB := zkevm-state-db
 DOCKERCOMPOSEPOOLDB := zkevm-pool-db
 DOCKERCOMPOSEEVENTDB := zkevm-event-db
 DOCKERCOMPOSENETWORK := zkevm-mock-l1-network
+DOCKERCOMPOSECONTRACTS := zkevm-contracts
 DOCKERCOMPOSEEXPLORERL1 := zkevm-explorer-l1
 DOCKERCOMPOSEEXPLORERL1DB := zkevm-explorer-l1-db
 DOCKERCOMPOSEEXPLORERL2 := zkevm-explorer-l2
@@ -37,7 +38,7 @@ RUNSYNC := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEAPPSYNC)
 RUNETHTXMANAGER := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEAPPETHTXMANAGER)
 RUNGRAFANA := DOCKERGID=`stat -c '%g' /var/run/docker.sock` $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEGRAFANA)
 
-RUNL1NETWORK := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSENETWORK)
+RUNL1NETWORK := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSENETWORK) && sleep 3 && $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSECONTRACTS)
 RUNEXPLORERL1 := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEEXPLORERL1)
 RUNEXPLORERL1DB := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEEXPLORERL1DB)
 RUNEXPLORERL2 := $(DOCKERCOMPOSE) up -d $(DOCKERCOMPOSEEXPLORERL2)
@@ -342,10 +343,6 @@ build-docker-compose: ## Builds docker-compose.yml
 	@sed -i.bak 's/<l2-chain-id>/$(L2_CHAIN_ID)/g' docker-compose.yml
 	@rm -f docker-compose.yml.bak
 
-.PHONY: deploy-l1-network-contracts
-deploy-l1-network-contracts: ## Deploys contracts to L1 network
-	docker exec -it zkevm-mock-l1-network bash docker/scripts/deploy-contracts.sh
-
 .PHONY: run-l2-explorer-json-rpc
 run-l2-explorer-json-rpc: ## Runs L2 explorer json rpc
 	$(RUNEXPLORERJSONRPC)
@@ -466,7 +463,7 @@ run: ## Runs a full node
 	$(RUNPOOLDB)
 	$(RUNEVENTDB)
 	$(RUNL1NETWORK)
-	sleep 1
+	sleep 2
 	$(RUNZKPROVER)
 	$(RUNAPPROVE)
 	sleep 3
