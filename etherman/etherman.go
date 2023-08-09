@@ -186,9 +186,8 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 			MultiGasProvider: cfg.MultiGasProvider,
 			Providers:        gProviders,
 		},
-		L2ChainID: cfg.L2ChainID,
-		l1Cfg:     l1Config,
-		auth:      map[common.Address]bind.TransactOpts{},
+		l1Cfg: l1Config,
+		auth:  map[common.Address]bind.TransactOpts{},
 	}, nil
 }
 
