@@ -346,11 +346,6 @@ build-docker-compose: ## Builds docker-compose.yml
 			exit 1; \
 	fi
 	@sed -i.bak 's/<deployer-private-key>/$(DEPLOYER_PRIVATE_KEY)/g' docker-compose.yml
-	@if [ -z "$(DEPLOYER_ADDRESS)" ]; then \
-			echo "Error: DEPLOYER_ADDRESS variable is not set. Please provide a value."; \
-			exit 1; \
-	fi
-	@sed -i.bak 's/<deployer-address>/$(DEPLOYER_ADDRESS)/g' docker-compose.yml
 	@rm -f docker-compose.yml.bak
 
 .PHONY: run-l2-explorer-json-rpc
