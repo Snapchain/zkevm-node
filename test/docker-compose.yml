@@ -456,7 +456,8 @@ services:
     environment:
       - L2_CHAIN_ID=<l2-chain-id>
       - JSONRPC_HTTP_URL=http://zkevm-mock-l1-network:8545
-
+      - DEPLOYER_PRIVATE_KEY=<deployer-private-key>
+      
   zkevm-prover:
     container_name: zkevm-prover
     image: hermeznetwork/zkevm-prover:v2.1.0-RC2
