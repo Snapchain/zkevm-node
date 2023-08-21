@@ -1,3 +1,5 @@
+name: Build-Docker image (dev)
+
 on:
   push:
     branches:
@@ -29,4 +31,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            hermeznetwork/zkevm-node:develop
+            snapchain/zkevm-node:develop

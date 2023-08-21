@@ -1,3 +1,4 @@
+name: Build-Docker image (dev)
 on:
   push:
     tags:
@@ -30,4 +31,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            hermeznetwork/zkevm-node:${{ github.ref_name }}
+            snapchain/zkevm-node:${{ github.ref_name }}
