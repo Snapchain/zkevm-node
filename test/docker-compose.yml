@@ -60,7 +60,7 @@ services:
       - 9092:9091 # needed if metrics enabled
       - 6060:6060
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
@@ -81,7 +81,7 @@ services:
       zkevm-sync:
         condition: service_started
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
       - ZKEVM_NODE_SEQUENCER_SENDER_ADDRESS=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
     volumes:
@@ -108,7 +108,7 @@ services:
       - 8133:8133 # needed if WebSockets enabled
       - 9091:9091 # needed if metrics enabled
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
       - VIRTUAL_HOST=rpc-l2.<user-rollup-identifier>
       - LETSENCRYPT_HOST=rpc-l2.<user-rollup-identifier>
@@ -135,7 +135,7 @@ services:
       - 50081:50081
       - 9093:9091 # needed if metrics enabled
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_AGGREGATOR_SENDER_ADDRESS=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
@@ -154,7 +154,7 @@ services:
     ports:
       - 9095:9091 # needed if metrics enabled
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
@@ -176,7 +176,7 @@ services:
     ports:
       - 9094:9091 # needed if metrics enabled
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
     volumes:
       - ./sequencer.keystore:/pk/sequencer.keystore
       - ./aggregator.keystore:/pk/aggregator.keystore
@@ -385,7 +385,7 @@ services:
       - 8124:8124
       - 8134:8134 # needed if WebSockets enabled
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
       - ZKEVM_NODE_RPC_PORT=8124
       - ZKEVM_NODE_RPC_WEBSOCKETS_PORT=8134
@@ -460,7 +460,7 @@ services:
       
   zkevm-prover:
     container_name: zkevm-prover
-    image: hermeznetwork/zkevm-prover:v2.1.0-RC2
+    image: hermeznetwork/zkevm-prover:v2.1.0
     depends_on:
       zkevm-state-db:
         condition: service_healthy
@@ -481,7 +481,7 @@ services:
       zkevm-state-db:
         condition: service_healthy
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
     volumes:
       - ./sequencer.keystore:/pk/keystore
       - ./config/test.node.config.toml:/app/config.toml
@@ -520,10 +520,10 @@ services:
       - 8125:8125
     environment:
       - ZKEVM_NODE_ISTRUSTEDSEQUENCER=false
-      - ZKEVM_NODE_STATEDB_USER=test_user
-      - ZKEVM_NODE_STATEDB_PASSWORD=test_password
-      - ZKEVM_NODE_STATEDB_NAME=state_db
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-permissionless-db
+      - ZKEVM_NODE_STATE_DB_USER=test_user
+      - ZKEVM_NODE_STATE_DB_PASSWORD=test_password
+      - ZKEVM_NODE_STATE_DB_NAME=state_db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-permissionless-db
       - ZKEVM_NODE_POOL_DB_USER=test_user
       - ZKEVM_NODE_POOL_DB_PASSWORD=test_password
       - ZKEVM_NODE_POOL_DB_NAME=pool_db
@@ -542,7 +542,7 @@ services:
 
   zkevm-permissionless-prover:
     container_name: zkevm-permissionless-prover
-    image: hermeznetwork/zkevm-prover:v2.1.0-RC2
+    image: hermeznetwork/zkevm-prover:v2.1.0
     ports:
       # - 50058:50058 # Prover
       - 50059:50052 # Mock prover
@@ -571,7 +571,7 @@ services:
     stdin_open: true 
     tty: true
     environment:
-      - ZKEVM_NODE_STATEDB_HOST=zkevm-state-db
+      - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
       - ZKEVM_NODE_POOL_DB_HOST=zkevm-pool-db
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
