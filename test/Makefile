@@ -493,7 +493,7 @@ run: ## Runs a full node
 	$(RUNAPPROVE)
 	sleep 3
 	$(RUNSYNC)
-	sleep 2
+	sleep 6
 	$(RUNETHTXMANAGER)
 	$(RUNSEQUENCER)
 	$(RUNSEQUENCESENDER)
